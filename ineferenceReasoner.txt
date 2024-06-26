@@ -1,0 +1,61 @@
+https://atomgraph.github.io/SPARQL-Playground/
+
+PropertyGraph vs Semantic Web
+https://www.michaeldebellis.com/post/owlvspropgraphs
+
+Shapes Constraint Language
+https://www.w3.org/TR/shacl/
+
+
+Semantic Web Rule Language
+SWRL
+https://www.w3.org/submissions/SWRL/
+
+ let's consider an example where we have an ontology that includes the following facts:
+
+"All men are mortal."
+"Socrates is a man."
+These facts can be represented in RDF and OWL as follows:
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix : <http://example.org/> .
+
+:Man a owl:Class .
+
+:Mortal a owl:Class .
+
+:manIsMortal a owl:ObjectProperty ;
+    rdfs:domain :Man ;
+    rdfs:range :Mortal .
+
+:Socrates a :Man .
+
+In this RDF/OWL representation, :Man and :Mortal are classes, :manIsMortal is a property that relates :Man to :Mortal, and :Socrates is an instance of the :Man class.
+
+Now, if we use an OWL reasoner (a piece of software that can infer new knowledge from existing data), it can infer from these facts that "Socrates is mortal". This new fact is not explicitly stated in the data, but it follows logically from the existing facts and the semantics of OWL.
+
+The reasoner can do this because it understands the semantics of rdfs:domain and rdfs:range: if a resource has a property with a certain domain and range, then that resource is an instance of the domain class, and the value of the property is an instance of the range class. So in this case, because :Socrates has the :manIsMortal property, and the domain of :manIsMortal is :Man and the range is :Mortal, the reasoner can infer that :Socrates is an instance of the :Mortal class, i.e., "Socrates is mortal".
+
+This is a simple example, but OWL supports a wide range of logical constructs that allow for much more complex reasoning.
+
+
+Unfortunately, RDFLib, the Python library used in previous examples, does not have built-in support for OWL reasoning. You would need to use a separate OWL reasoner, such as Pellet, HermiT, or FaCT++, to perform reasoning on RDF/OWL data
+
+
+
+owlready2 (uses HermiT & Pellet Java reasoners)
+
+The output of the code would be a list of classes that Socrates is an instance of. This list will include both the explicit classes that were defined in the code, as well as any classes that were inferred by the reasoner.
+
+In this case, since we have defined Socrates as a Man, and we have a rule that every Man is a Mortal, the reasoner will infer that Socrates is also a Mortal.
+
+So, the output of the code will be something like this:
+
+[onto.Socrates, onto.Man, onto.Mortal, owl.Thing]
+
+This output indicates that Socrates is an instance of the Socrates, Man, Mortal, and owl.Thing classes. owl.Thing is a built-in OWL class that includes all individuals. The onto.Socrates class is a result of the way Owlready2 handles individuals (it automatically creates a Python class for each individual).
+
+This shows how the reasoner has inferred new knowledge (that Socrates is a Mortal) from the existing data and the semantics of the is_mortal property.
+
+Owlready2 maintains a RDF quadstore in an optimized database (SQLite3), either in memory or on the disk (see Worlds). It provides a high-level access to the Classes and the objects in the ontology (aka. ontology-oriented programming). Classes and Invididuals are loaded dynamically from the quadstore as needed, cached in memory and destroyed when no longer needed.
